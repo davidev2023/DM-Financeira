@@ -379,6 +379,7 @@ window.salvarCliente = salvarCliente;
 window.pagar = pagar;
 
 window.whatsapp = whatsapp;
+window.comprovante = comprovante;
 
 
 
