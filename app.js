@@ -41,6 +41,7 @@ let clientes = [];
 
 async function salvarCliente(){
 
+
     let nome = document.getElementById("nome").value;
     let cpf = document.getElementById("cpf").value;
     let telefone = document.getElementById("telefone").value;
@@ -62,6 +63,7 @@ async function salvarCliente(){
     }
 
 
+
     let parcela = 0;
 
 
@@ -78,6 +80,7 @@ async function salvarCliente(){
 
     await addDoc(collection(db,"clientes"),{
 
+
         nome,
         cpf,
         telefone,
@@ -92,7 +95,9 @@ async function salvarCliente(){
 
         data
 
+
     });
+
 
 
     limpar();
@@ -102,7 +107,10 @@ async function salvarCliente(){
 
     alert("Cliente salvo no Firebase!");
 
+
 }
+
+
 
 
 
@@ -110,12 +118,14 @@ async function salvarCliente(){
 
 async function mostrarClientes(){
 
+
     clientes = [];
 
 
     const querySnapshot = await getDocs(
         collection(db,"clientes")
     );
+
 
 
     querySnapshot.forEach((documento)=>{
@@ -139,16 +149,20 @@ async function mostrarClientes(){
     );
 
 
+
     lista.innerHTML = "";
 
 
 
     if(clientes.length == 0){
 
+
         lista.innerHTML =
         "<p>Nenhum cliente cadastrado</p>";
 
+
         return;
+
 
     }
 
@@ -227,11 +241,13 @@ async function pagar(id){
     );
 
 
+
     if(cliente.pagas < cliente.totalParcelas){
 
         cliente.pagas++;
 
     }
+
 
 
     await updateDoc(
@@ -263,6 +279,7 @@ function whatsapp(numero,nome){
 
     let mensagem =
 `Olá ${nome}, passando para lembrar da sua parcela da DM Financeira.`;
+
 
 
     let url =
@@ -317,7 +334,6 @@ mostrarClientes();
 
 
 
-
 // ===============================
 // INSTALAÇÃO PWA
 // ===============================
@@ -327,9 +343,7 @@ let eventoInstalacao = null;
 
 
 
-window.addEventListener(
-"beforeinstallprompt",
-(e)=>{
+window.addEventListener("beforeinstallprompt", (e)=>{
 
 
     e.preventDefault();
@@ -338,8 +352,18 @@ window.addEventListener(
     eventoInstalacao = e;
 
 
-    const botao =
-    document.getElementById("btnInstalar");
+    mostrarBotaoInstalar();
+
+
+});
+
+
+
+
+function mostrarBotaoInstalar(){
+
+
+    const botao = document.getElementById("btnInstalar");
 
 
 
@@ -353,30 +377,50 @@ window.addEventListener(
         botao.onclick = async()=>{
 
 
-            eventoInstalacao.prompt();
+            if(eventoInstalacao){
 
 
-            const resultado =
-            await eventoInstalacao.userChoice;
+                eventoInstalacao.prompt();
 
 
 
-            console.log(
-                "Instalação:",
-                resultado.outcome
-            );
+                const resultado = 
+                await eventoInstalacao.userChoice;
 
 
-            eventoInstalacao = null;
+
+                console.log(
+                    "Instalação:",
+                    resultado.outcome
+                );
 
 
-            botao.style.display = "none";
+
+                eventoInstalacao = null;
+
+
+
+                botao.style.display = "none";
+
+
+            }
 
 
         };
 
 
     }
+
+
+}
+
+
+
+
+window.addEventListener("load",()=>{
+
+
+    mostrarBotaoInstalar();
 
 
 });
