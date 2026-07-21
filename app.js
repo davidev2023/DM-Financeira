@@ -34,32 +34,23 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 
-
 let clientes = [];
-
 
 
 // CADASTRAR CLIENTE
 
 async function salvarCliente(){
 
-
     let nome = document.getElementById("nome").value;
-
     let cpf = document.getElementById("cpf").value;
-
     let telefone = document.getElementById("telefone").value;
-
     let endereco = document.getElementById("endereco").value;
-
 
     let valor = Number(
         document.getElementById("valor").value
     );
 
-
     let data = document.getElementById("data").value;
-
 
 
     if(nome === "" || telefone === ""){
@@ -69,7 +60,6 @@ async function salvarCliente(){
         return;
 
     }
-
 
 
     let parcela = 0;
@@ -88,14 +78,12 @@ async function salvarCliente(){
 
     await addDoc(collection(db,"clientes"),{
 
-
         nome,
         cpf,
         telefone,
         endereco,
 
         valor,
-
         parcela,
 
         totalParcelas:24,
@@ -104,9 +92,7 @@ async function salvarCliente(){
 
         data
 
-
     });
-
 
 
     limpar();
@@ -120,11 +106,9 @@ async function salvarCliente(){
 
 
 
-
 // MOSTRAR CLIENTES
 
 async function mostrarClientes(){
-
 
     clientes = [];
 
@@ -132,7 +116,6 @@ async function mostrarClientes(){
     const querySnapshot = await getDocs(
         collection(db,"clientes")
     );
-
 
 
     querySnapshot.forEach((documento)=>{
@@ -156,14 +139,13 @@ async function mostrarClientes(){
     );
 
 
-
-    lista.innerHTML="";
+    lista.innerHTML = "";
 
 
 
     if(clientes.length == 0){
 
-        lista.innerHTML=
+        lista.innerHTML =
         "<p>Nenhum cliente cadastrado</p>";
 
         return;
@@ -245,13 +227,11 @@ async function pagar(id){
     );
 
 
-
     if(cliente.pagas < cliente.totalParcelas){
 
         cliente.pagas++;
 
     }
-
 
 
     await updateDoc(
@@ -267,12 +247,10 @@ async function pagar(id){
     );
 
 
-
     mostrarClientes();
 
 
 }
-
 
 
 
@@ -285,7 +263,6 @@ function whatsapp(numero,nome){
 
     let mensagem =
 `Olá ${nome}, passando para lembrar da sua parcela da DM Financeira.`;
-
 
 
     let url =
@@ -304,7 +281,7 @@ function whatsapp(numero,nome){
 
 
 
-// LIMPAR FORMULÁRIO
+// LIMPAR
 
 function limpar(){
 
@@ -324,7 +301,7 @@ document.getElementById("endereco").value="";
 
 
 
-// DEIXAR BOTÕES HTML FUNCIONANDO
+// BOTÕES HTML
 
 window.salvarCliente = salvarCliente;
 
@@ -341,13 +318,12 @@ mostrarClientes();
 
 
 
-
 // ===============================
-// INSTALAÇÃO DO PWA
+// INSTALAÇÃO PWA
 // ===============================
 
 
-let eventoInstalacao;
+let eventoInstalacao = null;
 
 
 
@@ -369,40 +345,35 @@ window.addEventListener(
 
     if(botao){
 
-        botao.style.display="block";
 
-    }
-
-
-});
+        botao.style.display = "block";
 
 
 
+        botao.onclick = async()=>{
 
 
-document.getElementById("btnInstalar")
-.addEventListener(
-"click",
-async()=>{
+            eventoInstalacao.prompt();
 
 
-    if(eventoInstalacao){
+            const resultado =
+            await eventoInstalacao.userChoice;
 
 
-        eventoInstalacao.prompt();
+
+            console.log(
+                "Instalação:",
+                resultado.outcome
+            );
 
 
-        const resultado =
-        await eventoInstalacao.userChoice;
+            eventoInstalacao = null;
 
 
-        console.log(
-            "Instalação:",
-            resultado.outcome
-        );
+            botao.style.display = "none";
 
 
-        eventoInstalacao = null;
+        };
 
 
     }
