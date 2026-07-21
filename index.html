@@ -1,67 +1,201 @@
-<!DOCTYPE html>  <html lang="pt-BR">  <head>  <meta charset="UTF-8">  <meta name="viewport" content="width=device-width, initial-scale=1.0">  <!-- PWA -->  <link rel="manifest" href="manifest.json">  <meta name="theme-color" content="#d4af37">  <title>DM Financeira</title>  <link rel="stylesheet" href="style.css">  </head>  <body>  <header>  <h1>DM Financeira</h1>  <p>Controle de Empréstimos</p>  </header>  <main>  <section class="card">  <h2>Novo Cliente</h2>  <input
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+<link rel="manifest" href="manifest.json">
+
+<meta name="theme-color" content="#d4af37">
+
+
+<title>DM Financeira</title>
+
+
+<link rel="stylesheet" href="style.css">
+
+
+</head>
+
+
+<body>
+
+
+<header>
+
+<h1>DM Financeira</h1>
+
+<p>Controle de Empréstimos</p>
+
+
+<button id="btnInstalar">
+
+📲 Instalar Aplicativo
+
+</button>
+
+
+</header>
+
+
+
+<main>
+
+
+<section class="card">
+
+
+<h2>Novo Cliente</h2>
+
+
+<input
 id="nome"
 type="text"
 placeholder="Nome completo"
+>
 
-> 
 
 <input
 id="cpf"
 type="text"
 placeholder="CPF"
+>
 
-> 
 
 <input
 id="telefone"
 type="text"
 placeholder="Telefone"
+>
 
-> 
 
 <input
 id="endereco"
 type="text"
 placeholder="Endereço"
+>
 
-> 
 
-<h2>Empréstimo</h2>  <select id="valor">  <option value="300">R$ 300</option>  <option value="400">R$ 400</option>  <option value="500">R$ 500</option>  <option value="600">R$ 600</option>  <option value="700">R$ 700</option>  <option value="800">R$ 800</option>  <option value="900">R$ 900</option>  <option value="1000">R$ 1.000</option>  </select>  <input
+
+<h2>Empréstimo</h2>
+
+
+
+<select id="valor">
+
+
+<option value="300">R$ 300</option>
+
+<option value="400">R$ 400</option>
+
+<option value="500">R$ 500</option>
+
+<option value="600">R$ 600</option>
+
+<option value="700">R$ 700</option>
+
+<option value="800">R$ 800</option>
+
+<option value="900">R$ 900</option>
+
+<option value="1000">R$ 1.000</option>
+
+
+</select>
+
+
+
+<input
 id="data"
 type="date"
+>
 
-> 
 
-<button onclick="salvarCliente()">  Cadastrar Empréstimo
 
-</button>  </section>  <section class="card">  <h2>Clientes</h2>  <div id="listaClientes">  <p>Nenhum cliente cadastrado</p>  </div>  </section>  </main>  <!-- Firebase / JavaScript -->  <script type="module" src="app.js"></script>  <!-- PWA Service Worker -->  <script>  
-  
-if ("serviceWorker" in navigator) {  
-  
-  
-window.addEventListener("load",()=>{  
-  
-  
-navigator.serviceWorker.register("service-worker.js")  
-  
-.then(()=>{  
-  
-console.log("Service Worker ativo");  
-  
-})  
-  
-  
-.catch((erro)=>{  
-  
-console.log("Erro no Service Worker:", erro);  
-  
-});  
-  
-  
-});  
-  
-  
-}  
-  
-  
-</script>  </body>  </html>
+<button onclick="salvarCliente()">
+
+Cadastrar Empréstimo
+
+</button>
+
+
+</section>
+
+
+
+
+<section class="card">
+
+
+<h2>Clientes</h2>
+
+
+<div id="listaClientes">
+
+
+<p>Nenhum cliente cadastrado</p>
+
+
+</div>
+
+
+</section>
+
+
+</main>
+
+
+
+
+
+<script type="module" src="app.js"></script>
+
+
+
+
+
+<script>
+
+
+if ("serviceWorker" in navigator) {
+
+
+window.addEventListener("load",()=>{
+
+
+navigator.serviceWorker.register("service-worker.js")
+
+.then(()=>{
+
+console.log("Service Worker ativo");
+
+})
+
+
+.catch((erro)=>{
+
+
+console.log("Erro Service Worker:",erro);
+
+
+});
+
+
+});
+
+
+}
+
+
+
+</script>
+
+
+
+</body>
+
+</html>
