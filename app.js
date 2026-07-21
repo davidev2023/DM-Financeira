@@ -206,6 +206,10 @@ async function mostrarClientes(){
 
             </button>
 
+           <button onclick="comprovante('${cliente.id}')">
+📄 Enviar Comprovante
+
+            </button>
 
             </div>
 
