@@ -90,11 +90,8 @@ async function salvarCliente(){
 
 
         nome,
-
         cpf,
-
         telefone,
-
         endereco,
 
         valor,
@@ -114,7 +111,6 @@ async function salvarCliente(){
 
     limpar();
 
-
     mostrarClientes();
 
 
@@ -124,7 +120,8 @@ async function salvarCliente(){
 
 
 
-// BUSCAR CLIENTES
+
+// MOSTRAR CLIENTES
 
 async function mostrarClientes(){
 
@@ -138,14 +135,14 @@ async function mostrarClientes(){
 
 
 
-    querySnapshot.forEach((doc)=>{
+    querySnapshot.forEach((documento)=>{
 
 
         clientes.push({
 
-            id:doc.id,
+            id:documento.id,
 
-            ...doc.data()
+            ...documento.data()
 
         });
 
@@ -191,12 +188,12 @@ async function mostrarClientes(){
 
 
         <p>
-        Empréstimo: R$ ${cliente.valor}
+        Empréstimo: R$ ${cliente.valor},00
         </p>
 
 
         <p>
-        Parcela: R$ ${cliente.parcela}
+        Parcela: R$ ${cliente.parcela},00
         </p>
 
 
@@ -238,7 +235,7 @@ async function mostrarClientes(){
 
 
 
-// REGISTRAR PAGAMENTO
+// PAGAMENTO
 
 async function pagar(id){
 
@@ -258,12 +255,15 @@ async function pagar(id){
 
 
     await updateDoc(
+
         doc(db,"clientes",id),
+
         {
 
             pagas:cliente.pagas
 
         }
+
     );
 
 
@@ -275,6 +275,10 @@ async function pagar(id){
 
 
 
+
+
+
+// WHATSAPP
 
 function whatsapp(numero,nome){
 
@@ -300,6 +304,8 @@ function whatsapp(numero,nome){
 
 
 
+// LIMPAR FORMULÁRIO
+
 function limpar(){
 
 
@@ -317,7 +323,8 @@ document.getElementById("endereco").value="";
 
 
 
-// deixar funções disponíveis para os botões HTML
+
+// DEIXAR BOTÕES HTML FUNCIONANDO
 
 window.salvarCliente = salvarCliente;
 
@@ -328,3 +335,77 @@ window.whatsapp = whatsapp;
 
 
 mostrarClientes();
+
+
+
+
+
+
+
+// ===============================
+// INSTALAÇÃO DO PWA
+// ===============================
+
+
+let eventoInstalacao;
+
+
+
+window.addEventListener(
+"beforeinstallprompt",
+(e)=>{
+
+
+    e.preventDefault();
+
+
+    eventoInstalacao = e;
+
+
+    const botao =
+    document.getElementById("btnInstalar");
+
+
+
+    if(botao){
+
+        botao.style.display="block";
+
+    }
+
+
+});
+
+
+
+
+
+document.getElementById("btnInstalar")
+.addEventListener(
+"click",
+async()=>{
+
+
+    if(eventoInstalacao){
+
+
+        eventoInstalacao.prompt();
+
+
+        const resultado =
+        await eventoInstalacao.userChoice;
+
+
+        console.log(
+            "Instalação:",
+            resultado.outcome
+        );
+
+
+        eventoInstalacao = null;
+
+
+    }
+
+
+});
