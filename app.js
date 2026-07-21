@@ -1,16 +1,65 @@
-let clientes = JSON.parse(localStorage.getItem("clientes")) || [];
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import { 
+    getFirestore,
+    collection,
+    addDoc,
+    getDocs,
+    updateDoc,
+    doc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 
-function salvarCliente(){
+const firebaseConfig = {
+
+  apiKey: "AIzaSyC4NYw4bewHQ4M_TctHVQzq1BkJFWJb9W4",
+
+  authDomain: "dm-financeira.firebaseapp.com",
+
+  projectId: "dm-financeira",
+
+  storageBucket: "dm-financeira.firebasestorage.app",
+
+  messagingSenderId: "167583421460",
+
+  appId: "1:167583421460:web:1a34d6d2b8f90973ae8301",
+
+  measurementId: "G-Q4NEDP6435"
+
+};
+
+
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+
+
+
+let clientes = [];
+
+
+
+// CADASTRAR CLIENTE
+
+async function salvarCliente(){
+
 
     let nome = document.getElementById("nome").value;
+
     let cpf = document.getElementById("cpf").value;
+
     let telefone = document.getElementById("telefone").value;
+
     let endereco = document.getElementById("endereco").value;
 
-    let valor = Number(document.getElementById("valor").value);
+
+    let valor = Number(
+        document.getElementById("valor").value
+    );
+
 
     let data = document.getElementById("data").value;
+
 
 
     if(nome === "" || telefone === ""){
@@ -18,10 +67,11 @@ function salvarCliente(){
         alert("Preencha nome e telefone");
 
         return;
+
     }
 
 
-    // tabela DM Financeira
+
     let parcela = 0;
 
 
@@ -36,13 +86,15 @@ function salvarCliente(){
 
 
 
-    let cliente = {
+    await addDoc(collection(db,"clientes"),{
 
-        id: Date.now(),
 
         nome,
+
         cpf,
+
         telefone,
+
         endereco,
 
         valor,
@@ -55,41 +107,67 @@ function salvarCliente(){
 
         data
 
-    };
 
+    });
 
-    clientes.push(cliente);
-
-
-    localStorage.setItem(
-        "clientes",
-        JSON.stringify(clientes)
-    );
 
 
     limpar();
 
+
     mostrarClientes();
 
 
-    alert("Empréstimo cadastrado!");
+    alert("Cliente salvo no Firebase!");
 
 }
 
 
 
+// BUSCAR CLIENTES
 
-function mostrarClientes(){
+async function mostrarClientes(){
 
-    let lista = document.getElementById("listaClientes");
+
+    clientes = [];
+
+
+    const querySnapshot = await getDocs(
+        collection(db,"clientes")
+    );
+
+
+
+    querySnapshot.forEach((doc)=>{
+
+
+        clientes.push({
+
+            id:doc.id,
+
+            ...doc.data()
+
+        });
+
+
+    });
+
+
+
+    let lista = document.getElementById(
+        "listaClientes"
+    );
+
 
 
     lista.innerHTML="";
 
 
+
     if(clientes.length == 0){
 
-        lista.innerHTML="<p>Nenhum cliente cadastrado</p>";
+        lista.innerHTML=
+        "<p>Nenhum cliente cadastrado</p>";
 
         return;
 
@@ -111,12 +189,14 @@ function mostrarClientes(){
 
         <p>Telefone: ${cliente.telefone}</p>
 
-        <p>Empréstimo: R$ ${cliente.valor}</p>
+
+        <p>
+        Empréstimo: R$ ${cliente.valor}
+        </p>
 
 
         <p>
-        Parcela:
-        R$ ${cliente.parcela}
+        Parcela: R$ ${cliente.parcela}
         </p>
 
 
@@ -127,7 +207,7 @@ function mostrarClientes(){
 
 
 
-        <button onclick="pagar(${cliente.id})">
+        <button onclick="pagar('${cliente.id}')">
 
         Registrar pagamento
 
@@ -157,10 +237,16 @@ function mostrarClientes(){
 
 
 
-function pagar(id){
+
+// REGISTRAR PAGAMENTO
+
+async function pagar(id){
 
 
-    let cliente = clientes.find(c=>c.id===id);
+    let cliente = clientes.find(
+        c=>c.id===id
+    );
+
 
 
     if(cliente.pagas < cliente.totalParcelas){
@@ -170,13 +256,20 @@ function pagar(id){
     }
 
 
-    localStorage.setItem(
-        "clientes",
-        JSON.stringify(clientes)
+
+    await updateDoc(
+        doc(db,"clientes",id),
+        {
+
+            pagas:cliente.pagas
+
+        }
     );
 
 
+
     mostrarClientes();
+
 
 }
 
@@ -190,10 +283,12 @@ function whatsapp(numero,nome){
 `Olá ${nome}, passando para lembrar da sua parcela da DM Financeira.`;
 
 
+
     let url =
     "https://wa.me/55"+numero+
     "?text="+
     encodeURIComponent(mensagem);
+
 
 
     window.open(url);
@@ -204,15 +299,31 @@ function whatsapp(numero,nome){
 
 
 
+
 function limpar(){
 
+
 document.getElementById("nome").value="";
+
 document.getElementById("cpf").value="";
+
 document.getElementById("telefone").value="";
+
 document.getElementById("endereco").value="";
+
 
 }
 
+
+
+
+// deixar funções disponíveis para os botões HTML
+
+window.salvarCliente = salvarCliente;
+
+window.pagar = pagar;
+
+window.whatsapp = whatsapp;
 
 
 
