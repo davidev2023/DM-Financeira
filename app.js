@@ -7,6 +7,7 @@ import {
     addDoc,
     getDocs,
     updateDoc,
+    deleteDoc,
     doc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
@@ -211,6 +212,11 @@ async function mostrarClientes(){
 
             </button>
 
+           <button onclick="excluirCliente('${cliente.id}')">
+🗑️ Excluir Cliente
+         
+          </button>
+
             </div>
 
             `;
@@ -351,6 +357,36 @@ DM Financeira`;
 
 }
 
+async function excluirCliente(id){
+
+    let confirmar = confirm(
+        "Deseja realmente excluir este cliente?"
+    );
+
+    if(!confirmar){
+        return;
+    }
+
+    try{
+
+        await deleteDoc(
+            doc(db, "clientes", id)
+        );
+
+        alert("Cliente excluído com sucesso!");
+
+        mostrarClientes();
+
+    }catch(error){
+
+        console.error(error);
+
+        alert("Erro ao excluir cliente.");
+
+    }
+
+}
+
 
 
 
@@ -379,7 +415,10 @@ window.salvarCliente = salvarCliente;
 window.pagar = pagar;
 
 window.whatsapp = whatsapp;
+
 window.comprovante = comprovante;
+
+window.excluirCliente = excluirCliente;
 
 
 
