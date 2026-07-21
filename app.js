@@ -342,3 +342,97 @@ window.whatsapp = whatsapp;
 // CARREGAR CLIENTES AO ABRIR
 
 mostrarClientes();
+
+// INSTALAÇÃO DO APLICATIVO PWA
+
+
+let eventoInstalacao = null;
+
+
+
+window.addEventListener(
+"beforeinstallprompt",
+(evento)=>{
+
+
+evento.preventDefault();
+
+
+eventoInstalacao = evento;
+
+
+
+let botao = document.getElementById(
+"btnInstalar"
+);
+
+
+
+if(botao){
+
+botao.style.display="block";
+
+}
+
+
+});
+
+
+
+
+
+document
+.getElementById("btnInstalar")
+?.addEventListener(
+"click",
+async ()=>{
+
+
+if(!eventoInstalacao){
+
+
+alert(
+"Aplicativo já instalado ou instalação indisponível"
+);
+
+
+return;
+
+
+}
+
+
+
+eventoInstalacao.prompt();
+
+
+
+let escolha = await eventoInstalacao.userChoice;
+
+
+
+if(escolha.outcome === "accepted"){
+
+
+console.log(
+"Aplicativo instalado"
+);
+
+
+}else{
+
+
+console.log(
+"Instalação cancelada"
+);
+
+
+}
+
+
+
+eventoInstalacao = null;
+
+
+
+});
