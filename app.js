@@ -1,307 +1,279 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
-import { 
-    getFirestore,
-    collection,
-    addDoc,
-    getDocs,
-    updateDoc,
-    doc
+import {
+getFirestore,
+collection,
+addDoc,
+getDocs,
+updateDoc,
+doc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
 
 const firebaseConfig = {
 
-  apiKey: "AIzaSyC4NYw4bewHQ4M_TctHVQzq1BkJFWJb9W4",
+apiKey: "AIzaSyC4NYw4bewHQ4M_TctHVQzq1BkJFWJb9W4",
 
-  authDomain: "dm-financeira.firebaseapp.com",
+authDomain: "dm-financeira.firebaseapp.com",
 
-  projectId: "dm-financeira",
+projectId: "dm-financeira",
 
-  storageBucket: "dm-financeira.firebasestorage.app",
+storageBucket: "dm-financeira.firebasestorage.app",
 
-  messagingSenderId: "167583421460",
+messagingSenderId: "167583421460",
 
-  appId: "1:167583421460:web:1a34d6d2b8f90973ae8301",
+appId: "1:167583421460:web:1a34d6d2b8f90973ae8301",
 
-  measurementId: "G-Q4NEDP6435"
+measurementId: "G-Q4NEDP6435"
 
 };
-
 
 const app = initializeApp(firebaseConfig);
 
 const db = getFirestore(app);
 
-
 let clientes = [];
-
 
 // CADASTRAR CLIENTE
 
 async function salvarCliente(){
 
+let nome = document.getElementById("nome").value;  
 
-    let nome = document.getElementById("nome").value;
-    let cpf = document.getElementById("cpf").value;
-    let telefone = document.getElementById("telefone").value;
-    let endereco = document.getElementById("endereco").value;
+let cpf = document.getElementById("cpf").value;  
 
-    let valor = Number(
-        document.getElementById("valor").value
-    );
+let telefone = document.getElementById("telefone").value;  
 
-    let data = document.getElementById("data").value;
+let endereco = document.getElementById("endereco").value;  
 
 
-    if(nome === "" || telefone === ""){
+let valor = Number(  
+    document.getElementById("valor").value  
+);  
 
-        alert("Preencha nome e telefone");
 
-        return;
-
-    }
+let data = document.getElementById("data").value;  
 
 
 
-    let parcela = 0;
+if(nome === "" || telefone === ""){  
 
+    alert("Preencha nome e telefone");  
 
-    if(valor == 300) parcela = 17;
-    if(valor == 400) parcela = 22;
-    if(valor == 500) parcela = 28;
-    if(valor == 600) parcela = 33;
-    if(valor == 700) parcela = 39;
-    if(valor == 800) parcela = 44;
-    if(valor == 900) parcela = 50;
-    if(valor == 1000) parcela = 56;
+    return;  
+
+}  
 
 
 
-    await addDoc(collection(db,"clientes"),{
+let parcela = 0;  
 
 
-        nome,
-        cpf,
-        telefone,
-        endereco,
-
-        valor,
-        parcela,
-
-        totalParcelas:24,
-
-        pagas:0,
-
-        data
-
-
-    });
+if(valor == 300) parcela = 17;  
+if(valor == 400) parcela = 22;  
+if(valor == 500) parcela = 28;  
+if(valor == 600) parcela = 33;  
+if(valor == 700) parcela = 39;  
+if(valor == 800) parcela = 44;  
+if(valor == 900) parcela = 50;  
+if(valor == 1000) parcela = 56;  
 
 
 
-    limpar();
-
-    mostrarClientes();
+await addDoc(collection(db,"clientes"),{  
 
 
-    alert("Cliente salvo no Firebase!");
+    nome,  
 
+    cpf,  
+
+    telefone,  
+
+    endereco,  
+
+    valor,  
+
+    parcela,  
+
+    totalParcelas:24,  
+
+    pagas:0,  
+
+    data  
+
+
+});  
+
+
+
+limpar();  
+
+
+mostrarClientes();  
+
+
+alert("Cliente salvo no Firebase!");
 
 }
 
-
-
-
-
-// MOSTRAR CLIENTES
+// BUSCAR CLIENTES
 
 async function mostrarClientes(){
 
-
-    clientes = [];
-
-
-    const querySnapshot = await getDocs(
-        collection(db,"clientes")
-    );
+clientes = [];  
 
 
-
-    querySnapshot.forEach((documento)=>{
-
-
-        clientes.push({
-
-            id:documento.id,
-
-            ...documento.data()
-
-        });
-
-
-    });
+const querySnapshot = await getDocs(  
+    collection(db,"clientes")  
+);  
 
 
 
-    let lista = document.getElementById(
-        "listaClientes"
-    );
+querySnapshot.forEach((doc)=>{  
+
+
+    clientes.push({  
+
+        id:doc.id,  
+
+        ...doc.data()  
+
+    });  
+
+
+});  
 
 
 
-    lista.innerHTML = "";
+let lista = document.getElementById(  
+    "listaClientes"  
+);  
 
 
 
-    if(clientes.length == 0){
-
-
-        lista.innerHTML =
-        "<p>Nenhum cliente cadastrado</p>";
-
-
-        return;
-
-
-    }
+lista.innerHTML="";  
 
 
 
-    clientes.forEach(cliente=>{
+if(clientes.length == 0){  
 
+    lista.innerHTML=  
+    "<p>Nenhum cliente cadastrado</p>";  
 
-        lista.innerHTML += `
+    return;  
 
-
-        <div class="cliente">
-
-
-        <h3>${cliente.nome}</h3>
-
-
-        <p>Telefone: ${cliente.telefone}</p>
-
-
-        <p>
-        Empréstimo: R$ ${cliente.valor},00
-        </p>
-
-
-        <p>
-        Parcela: R$ ${cliente.parcela},00
-        </p>
-
-
-        <p>
-        Pagamento:
-        ${cliente.pagas}/${cliente.totalParcelas}
-        </p>
+}  
 
 
 
-        <button onclick="pagar('${cliente.id}')">
-
-        Registrar pagamento
-
-        </button>
+clientes.forEach(cliente=>{  
 
 
-
-        <button onclick="whatsapp('${cliente.telefone}','${cliente.nome}')">
-
-        Cobrar WhatsApp
-
-        </button>
+    lista.innerHTML += `  
 
 
-
-        </div>
-
-
-        `;
+    <div class="cliente">  
 
 
-    });
+    <h3>${cliente.nome}</h3>  
 
+
+    <p>Telefone: ${cliente.telefone}</p>  
+
+
+    <p>  
+    Empréstimo: R$ ${cliente.valor}  
+    </p>  
+
+
+    <p>  
+    Parcela: R$ ${cliente.parcela}  
+    </p>  
+
+
+    <p>  
+    Pagamento:  
+    ${cliente.pagas}/${cliente.totalParcelas}  
+    </p>  
+
+
+
+    <button onclick="pagar('${cliente.id}')">  
+
+    Registrar pagamento  
+
+    </button>  
+
+
+
+    <button onclick="whatsapp('${cliente.telefone}','${cliente.nome}')">  
+
+    Cobrar WhatsApp  
+
+    </button>  
+
+
+
+    </div>  
+
+
+    `;  
+
+
+});
 
 }
 
-
-
-
-
-// PAGAMENTO
+// REGISTRAR PAGAMENTO
 
 async function pagar(id){
 
-
-    let cliente = clientes.find(
-        c=>c.id===id
-    );
-
-
-
-    if(cliente.pagas < cliente.totalParcelas){
-
-        cliente.pagas++;
-
-    }
+let cliente = clientes.find(  
+    c=>c.id===id  
+);  
 
 
 
-    await updateDoc(
+if(cliente.pagas < cliente.totalParcelas){  
 
-        doc(db,"clientes",id),
+    cliente.pagas++;  
 
-        {
-
-            pagas:cliente.pagas
-
-        }
-
-    );
+}  
 
 
-    mostrarClientes();
 
+await updateDoc(  
+    doc(db,"clientes",id),  
+    {  
+
+        pagas:cliente.pagas  
+
+    }  
+);  
+
+
+
+mostrarClientes();
 
 }
-
-
-
-
-
-// WHATSAPP
 
 function whatsapp(numero,nome){
 
+let mensagem =
 
-    let mensagem =
-`Olá ${nome}, passando para lembrar da sua parcela da DM Financeira.`;
+Olá ${nome}, passando para lembrar da sua parcela da DM Financeira.;
 
-
-
-    let url =
-    "https://wa.me/55"+numero+
-    "?text="+
-    encodeURIComponent(mensagem);
+let url =  
+"https://wa.me/55"+numero+  
+"?text="+  
+encodeURIComponent(mensagem);  
 
 
 
-    window.open(url);
-
+window.open(url);
 
 }
 
-
-
-
-
-// LIMPAR
-
 function limpar(){
-
 
 document.getElementById("nome").value="";
 
@@ -311,14 +283,9 @@ document.getElementById("telefone").value="";
 
 document.getElementById("endereco").value="";
 
-
 }
 
-
-
-
-
-// BOTÕES HTML
+// deixar funções disponíveis para os botões HTML
 
 window.salvarCliente = salvarCliente;
 
@@ -326,101 +293,4 @@ window.pagar = pagar;
 
 window.whatsapp = whatsapp;
 
-
-
 mostrarClientes();
-
-
-
-
-
-// ===============================
-// INSTALAÇÃO PWA
-// ===============================
-
-
-let eventoInstalacao = null;
-
-
-
-window.addEventListener("beforeinstallprompt", (e)=>{
-
-
-    e.preventDefault();
-
-
-    eventoInstalacao = e;
-
-
-    mostrarBotaoInstalar();
-
-
-});
-
-
-
-
-function mostrarBotaoInstalar(){
-
-
-    const botao = document.getElementById("btnInstalar");
-
-
-
-    if(botao){
-
-
-        botao.style.display = "block";
-
-
-
-        botao.onclick = async()=>{
-
-
-            if(eventoInstalacao){
-
-
-                eventoInstalacao.prompt();
-
-
-
-                const resultado = 
-                await eventoInstalacao.userChoice;
-
-
-
-                console.log(
-                    "Instalação:",
-                    resultado.outcome
-                );
-
-
-
-                eventoInstalacao = null;
-
-
-
-                botao.style.display = "none";
-
-
-            }
-
-
-        };
-
-
-    }
-
-
-}
-
-
-
-
-window.addEventListener("load",()=>{
-
-
-    mostrarBotaoInstalar();
-
-
-});
