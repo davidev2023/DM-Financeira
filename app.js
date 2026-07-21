@@ -312,6 +312,45 @@ function whatsapp(numero,nome){
 
 }
 
+function comprovante(id){
+
+    let cliente = clientes.find(c => c.id === id);
+
+    if(!cliente){
+        alert("Cliente não encontrado");
+        return;
+    }
+
+    let restantes = cliente.totalParcelas - cliente.pagas;
+
+    let mensagem = `📄 COMPROVANTE DE PAGAMENTO
+
+🏦 DM Financeira
+
+👤 Cliente: ${cliente.nome}
+
+💰 Empréstimo: R$ ${cliente.valor}
+
+💵 Valor da parcela: R$ ${cliente.parcela}
+
+✅ Parcelas pagas: ${cliente.pagas}/${cliente.totalParcelas}
+
+⌛ Parcelas restantes: ${restantes}/${cliente.totalParcelas}
+
+Obrigado por manter seus pagamentos em dia.
+
+DM Financeira`;
+
+    let url =
+        "https://wa.me/55" +
+        cliente.telefone +
+        "?text=" +
+        encodeURIComponent(mensagem);
+
+    window.open(url);
+
+}
+
 
 
 
