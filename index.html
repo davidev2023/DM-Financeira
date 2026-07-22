@@ -4,17 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#d4af37">
+    <meta name="theme-color" content="#181818">
     <title>DM Financeira</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <header>
-        <h1>DM Financeira</h1>
-        <p>Controle de Empréstimos V18</p>
-        <button id="btnInstalar">📲 Instalar Aplicativo</button>
-        <button id="btnAtualizar" onclick="verificarAtualizacao()">🔄 Buscar Atualização</button>
+    <!-- BARRA SUPERIOR FIXA (TOP BAR) -->
+    <div class="top-bar">
+        <span class="top-bar-titulo">DM Financeira</span>
+        <button id="btnMenuHamburguer" class="btn-hamburguer" onclick="toggleHeader()">☰</button>
+    </div>
+
+    <!-- HEADER AMARELO QUE DESCE AO CLICAR NO HAMBÚRGUER -->
+    <header id="meuHeader" class="escondido">
+        <h1>Opções do Aplicativo</h1>
+        <div class="header-botoes">
+            <button id="btnInstalar">📲 Instalar Aplicativo</button>
+            <button id="btnAtualizar" onclick="verificarAtualizacao()">🔄 Buscar Atualização</button>
+        </div>
     </header>
 
     <main>
@@ -111,6 +119,12 @@
             <div id="detalhes"></div>
         </section>
     </main>
+
+    <!-- MODAL DE VISUALIZAÇÃO DE IMAGEM EM TELA CHEIA -->
+    <div id="modalImagem" class="modal-imagem" onclick="fecharModalImagem()">
+        <span class="fechar-modal">&times;</span>
+        <img id="imgModalExpandida" src="" alt="Imagem Expandida">
+    </div>
 
     <!-- NAVEGAÇÃO INFERIOR -->
     <nav>
