@@ -59,7 +59,7 @@ function converterImagemParaBase64(file) {
                 const ctx = canvas.getContext("2d");
                 ctx.drawImage(img, 0, 0, width, height);
 
-                // Comprime em JPEG leve para otimizar o salvamento no Firestore
+                // Comprime em JPEG leve para otimizar no Firestore
                 resolve(canvas.toDataURL("image/jpeg", 0.6));
             };
         };
@@ -84,7 +84,7 @@ function calcularAtraso(cliente) {
 
     while (dataAtual < hoje) {
         dataAtual.setDate(dataAtual.getDate() + 1);
-        if (dataAtual.getDay() !== 0) { // 0 = Domingo (ignorado)
+        if (dataAtual.getDay() !== 0) { // 0 = Domingo
             diffDias++;
         }
     }
@@ -488,7 +488,7 @@ window.abrirTela = abrirTela;
 // CARREGAR INICIAL
 mostrarClientes();
 
-// LOGICA PWA & SERVICE WORKER (COM AUTO-UPDATE AUTOMÁTICO)
+// LOGICA PWA & SERVICE WORKER (AUTO-UPDATE COMPLETO PARA APP INSTALADO)
 let eventoInstalacao = null;
 
 window.addEventListener("beforeinstallprompt", (evento) => {
@@ -511,19 +511,34 @@ document.getElementById("btnInstalar")?.addEventListener("click", async () => {
 
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js').then(reg => {
-            console.log('Service Worker ativo!', reg);
+        navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then(reg => {
+            console.log('Service Worker ativo!');
 
-            // Detecta quando o sw.js muda de versão no GitHub e recarrega automaticamente
+            // Força a verificação no GitHub imediatamente ao carregar
+            reg.update();
+
             reg.onupdatefound = () => {
                 const instalando = reg.installing;
+                if (instalando == null) return;
+
                 instalando.onstatechange = () => {
-                    if (instalando.state === 'installed' && navigator.serviceWorker.controller) {
-                        console.log('Nova versão encontrada! Recarregando...');
-                        window.location.reload();
+                    if (instalando.state === 'installed') {
+                        if (navigator.serviceWorker.controller) {
+                            // Envia o comando para o novo SW assumir na hora
+                            instalando.postMessage({ action: 'skipWaiting' });
+                        }
                     }
                 };
             };
         }).catch(err => console.error('Erro SW:', err));
+
+        // Quando o novo Service Worker tomar conta, a página atualiza sozinha
+        let recarregando = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+            if (!recarregando) {
+                recarregando = true;
+                window.location.reload();
+            }
+        });
     });
 }
