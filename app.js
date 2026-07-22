@@ -92,42 +92,60 @@ function converterImagemParaBase64(file) {
     });
 }
 
-// CALCULAR DIAS PASSADOS E PARCELAS EM ATRASO
+// CALCULAR DIAS PASSADOS E PARCELAS EM ATRASO (A COBRANÇA COMEÇA NO PRÓXIMO DIA ÚTIL)
 function calcularAtraso(cliente) {
     if (!cliente.data) return { atraso: 0, esperadas: 0, status: 'verde' };
 
-    const dataInicio = new Date(cliente.data + "T00:00:00");
-    const hoje = new Date();
-    hoje.setHours(0,0,0,0);
+    // Converte a data do contrato (YYYY-MM-DD) sem interferência de fuso horário
+    const [ano, mes, dia] = cliente.data.split('-').map(Number);
+    const dataInicio = new Date(ano, mes - 1, dia);
     
-    if (hoje < dataInicio) {
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+
+    // Se hoje é o dia do empréstimo ou anterior
+    if (hoje <= dataInicio) {
         return { atraso: 0, esperadas: 0, status: 'verde' };
     }
 
-    let diffDias = 0;
+    let diasAnteriores = 0; // Dias úteis vencidos até ONTEM
     let dataAtual = new Date(dataInicio);
+    
+    // Começa a contar a partir do dia SEGUINTE ao empréstimo
+    dataAtual.setDate(dataAtual.getDate() + 1);
 
     while (dataAtual < hoje) {
-        dataAtual.setDate(dataAtual.getDate() + 1);
-        if (dataAtual.getDay() !== 0) { // Exclui Domingo
-            diffDias++;
+        if (dataAtual.getDay() !== 0) { // Exclui Domingos
+            diasAnteriores++;
         }
+        dataAtual.setDate(dataAtual.getDate() + 1);
     }
-    
-    let esperadas = diffDias > 0 ? diffDias : 0;
-    if (esperadas > cliente.totalParcelas) esperadas = cliente.totalParcelas;
+
+    // Verifica se HOJE é dia útil
+    const hojeEhDiaUtil = (hoje.getDay() !== 0);
+    const esperadasAteHoje = diasAnteriores + (hojeEhDiaUtil ? 1 : 0);
 
     const pagas = Number(cliente.pagas) || 0;
-    const atraso = esperadas - pagas;
+
+    // Atraso considera apenas os dias úteis que já passaram (até ontem)
+    let atraso = diasAnteriores - pagas;
+    if (atraso < 0) atraso = 0;
 
     let status = 'verde';
+
     if (atraso > 0) {
-        status = 'vermelho';
-    } else if (diffDias === 0 && pagas === 0) {
-        status = 'amarelo';
+        status = 'vermelho'; // Possui diárias de dias anteriores pendentes
+    } else if (pagas < esperadasAteHoje) {
+        status = 'amarelo';  // Em dia com o passado, mas a de hoje está em aberto
+    } else {
+        status = 'verde';    // Tudo pago até o momento
     }
 
-    return { atraso: atraso > 0 ? atraso : 0, esperadas, status };
+    return {
+        atraso,
+        esperadas: esperadasAteHoje,
+        status
+    };
 }
 
 // NAVEGAÇÃO ENTRE TELAS
@@ -287,7 +305,7 @@ function abrirCliente(id) {
     let detalhes = document.getElementById("detalhes");
 
     let textoStatus = '🟢 Em Dia';
-    if (status === 'vermelho') textoStatus = `🔴 ATRASADO (${atraso} diárias pendentes)`;
+    if (status === 'vermelho') textoStatus = `🔴 ATRASADO (${atraso} diária(s) pendentes)`;
     if (status === 'amarelo') textoStatus = '🟡 Em aberto hoje';
 
     let urlFoto = cliente.foto ? cliente.foto : FOTO_PADRAO;
