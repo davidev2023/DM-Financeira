@@ -1,4 +1,4 @@
-const cacheName = "dm-financeira-v17";
+const cacheName = "dm-financeira-v14";
 
 const arquivos = [
   "./",
@@ -8,14 +8,14 @@ const arquivos = [
   "./manifest.json"
 ];
 
-// Escuta o comando enviado pelo app.js para assumir o controle imediatamente
+// Escuta a mensagem para ativar imediatamente sem aguardar o app ser fechado
 self.addEventListener("message", evento => {
   if (evento.data && evento.data.action === "skipWaiting") {
     self.skipWaiting();
   }
 });
 
-// INSTALAÇÃO: Baixa os novos arquivos
+// INSTALAÇÃO: Baixa os novos arquivos do cache
 self.addEventListener("install", evento => {
   evento.waitUntil(
     caches.open(cacheName)
@@ -24,14 +24,14 @@ self.addEventListener("install", evento => {
   self.skipWaiting();
 });
 
-// ATIVAÇÃO: Apaga os caches antigos (v1 a v12)
+// ATIVAÇÃO: Limpa todos os caches antigos das versões anteriores
 self.addEventListener("activate", evento => {
   evento.waitUntil(
     caches.keys().then(chaves => {
       return Promise.all(
         chaves.map(chave => {
           if (chave !== cacheName) {
-            console.log("Deletando cache antigo:", chave);
+            console.log("Removendo cache antigo:", chave);
             return caches.delete(chave);
           }
         })
@@ -41,7 +41,7 @@ self.addEventListener("activate", evento => {
   return self.clients.claim();
 });
 
-// BUSCA: Serve do cache ou busca na rede
+// BUSCA: Serve do cache local ou vai buscar na rede
 self.addEventListener("fetch", evento => {
   evento.respondWith(
     caches.match(evento.request)
