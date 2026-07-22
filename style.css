@@ -1,135 +1,272 @@
-
-
-*{
-    box-sizing:border-box;
-    font-family:Arial, Helvetica, sans-serif;
+* {
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
 }
 
-
-body{
-    margin:0;
-    background:#111;
-    color:white;
+html, body {
+    height: 100%;
+    background: #111;
+    color: #fff;
+    overflow: hidden;
 }
 
-
-header{
-    background:#d4af37;
-    color:#111;
-    text-align:center;
-    padding:25px;
+body {
+    display: flex;
+    flex-direction: column;
 }
 
-
-header h1{
-    margin:0;
-    font-size:32px;
+/* HEADER */
+header {
+    background: #d4af37;
+    color: #111;
+    padding: 12px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
 }
 
-
-header p{
-    margin:5px;
+header h1 {
+    font-size: 22px;
+    margin-bottom: 2px;
+    font-weight: 800;
 }
 
-
-main{
-    padding:20px;
+header p {
+    font-size: 13px;
+    margin-bottom: 6px;
+    opacity: 0.9;
 }
 
-
-.card{
-    background:#1c1c1c;
-    border-radius:15px;
-    padding:20px;
-    margin-bottom:20px;
-    box-shadow:0 0 10px #000;
+#btnInstalar {
+    background: #111;
+    color: #d4af37;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 13px;
+    cursor: pointer;
+    margin-top: 4px;
 }
 
-
-h2{
-    color:#d4af37;
+/* ÁREA PRINCIPAL */
+main {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px;
+    padding-bottom: 90px;
 }
 
-
-input, select{
-
-    width:100%;
-    padding:15px;
-    margin:8px 0;
-
-    border:none;
-    border-radius:8px;
-
-    background:#333;
-    color:white;
-
-    font-size:16px;
+.tela {
+    display: none;
 }
 
-
-button{
-
-    width:100%;
-    padding:15px;
-
-    margin-top:15px;
-
-    background:#d4af37;
-    color:#111;
-
-    border:none;
-    border-radius:10px;
-
-    font-size:18px;
-    font-weight:bold;
-
+.tela.ativa {
+    display: block;
 }
 
-
-button:hover{
-
-    background:#f1c94b;
-
+/* CARDS E SEÇÕES */
+.card {
+    background: #1c1c1c;
+    border-radius: 14px;
+    padding: 18px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    margin-bottom: 14px;
 }
 
-
-.cliente{
-
-    background:#252525;
-    padding:15px;
-
-    border-radius:10px;
-
-    margin-top:10px;
-
-    border-left:5px solid #d4af37;
-
+.card h2 {
+    color: #d4af37;
+    margin-bottom: 14px;
+    font-size: 20px;
 }
 
-
-.cliente h3{
-
-    margin:0;
-    color:#d4af37;
-
+.secao-form {
+    background: #242424;
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 14px;
+    border: 1px solid #333;
 }
 
-
-.cliente button{
-
-    background:#25D366;
-    color:white;
-    margin-top:10px;
-
+.secao-form h3 {
+    color: #d4af37;
+    font-size: 15px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #333;
+    padding-bottom: 4px;
 }
 
+label {
+    display: block;
+    font-size: 12px;
+    color: #aaa;
+    margin-top: 8px;
+    margin-bottom: 4px;
+    font-weight: bold;
+}
 
-.parcela{
+input, select {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 10px;
+    border: 1px solid #2a2a2a;
+    border-radius: 8px;
+    background: #1a1a1a;
+    color: #fff;
+    font-size: 14px;
+    outline: none;
+}
 
-    margin-top:10px;
-    padding:10px;
+input:focus, select:focus {
+    border-color: #d4af37;
+}
 
-    background:#333;
-    border-radius:8px;
+/* FOTOS DE PERFIL E DOCUMENTOS */
+.avatar-cliente {
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #d4af37;
+    flex-shrink: 0;
+}
 
+.avatar-detalhe {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #d4af37;
+    display: block;
+    margin: 0 auto 14px auto;
+}
+
+.img-anexo {
+    width: 100%;
+    max-height: 200px;
+    object-fit: contain;
+    border-radius: 8px;
+    border: 1px solid #d4af37;
+    margin-top: 8px;
+    background: #000;
+}
+
+.cliente-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+/* BOTÕES */
+button {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    background: #d4af37;
+    color: #111;
+    font-weight: bold;
+    font-size: 15px;
+    cursor: pointer;
+    margin-bottom: 8px;
+    transition: opacity 0.15s ease, transform 0.1s ease;
+}
+
+button:active {
+    opacity: 0.8;
+    transform: scale(0.98);
+}
+
+button[onclick*="excluirCliente"] {
+    background: #2a1111;
+    color: #ff5555;
+    border: 1px solid #ff3333;
+    margin-top: 10px;
+}
+
+/* DASHBOARD */
+.dashboard {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.box {
+    background: #1c1c1c;
+    border: 1px solid #d4af37;
+    border-radius: 16px;
+    padding: 16px;
+}
+
+.box h3 {
+    color: #d4af37;
+    font-size: 13px;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.box p {
+    font-size: 20px;
+    font-weight: bold;
+    word-break: break-all;
+}
+
+/* LISTA */
+.cliente {
+    background: #1c1c1c;
+    border-left: 4px solid #d4af37;
+    padding: 14px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.cliente:active {
+    background: #282828;
+}
+
+.cliente h3 {
+    color: #d4af37;
+    font-size: 16px;
+    margin-bottom: 4px;
+}
+
+.cliente p {
+    font-size: 13px;
+    color: #ccc;
+    margin: 2px 0;
+}
+
+/* NAV FOOTER */
+nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 65px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background: #1c1c1c;
+    border-top: 1px solid #d4af37;
+    z-index: 1000;
+}
+
+nav button {
+    background: none;
+    color: #888;
+    font-size: 24px;
+    width: auto;
+    padding: 10px 20px;
+    margin-bottom: 0;
+}
+
+nav button:active {
+    color: #d4af37;
+    transform: scale(1.1);
 }
