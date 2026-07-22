@@ -31,6 +31,32 @@ function formatarMoeda(valor) {
     return Number(valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
 
+// ABRIR / FECHAR HEADER
+window.toggleHeader = function() {
+    const header = document.getElementById("meuHeader");
+    if (header) {
+        header.classList.toggle("escondido");
+    }
+};
+
+// VISUALIZADOR DE IMAGEM EM TELA CHEIA
+window.abrirModalImagem = function(src) {
+    if (!src) return;
+    const modal = document.getElementById("modalImagem");
+    const imgModal = document.getElementById("imgModalExpandida");
+    if (modal && imgModal) {
+        imgModal.src = src;
+        modal.classList.add("ativo");
+    }
+};
+
+window.fecharModalImagem = function() {
+    const modal = document.getElementById("modalImagem");
+    if (modal) {
+        modal.classList.remove("ativo");
+    }
+};
+
 // CONVERTER E COMPACTAR IMAGEM PARA BASE64
 function converterImagemParaBase64(file) {
     return new Promise((resolve, reject) => {
@@ -59,7 +85,6 @@ function converterImagemParaBase64(file) {
                 const ctx = canvas.getContext("2d");
                 ctx.drawImage(img, 0, 0, width, height);
 
-                // Comprime em JPEG leve para salvar rápido no Firestore
                 resolve(canvas.toDataURL("image/jpeg", 0.6));
             };
         };
@@ -67,7 +92,7 @@ function converterImagemParaBase64(file) {
     });
 }
 
-// CALCULAR DIAS PASSADOS E PARCELAS EM ATRASO (IGNORANDO DOMINGOS)
+// CALCULAR DIAS PASSADOS E PARCELAS EM ATRASO
 function calcularAtraso(cliente) {
     if (!cliente.data) return { atraso: 0, esperadas: 0, status: 'verde' };
 
@@ -84,7 +109,7 @@ function calcularAtraso(cliente) {
 
     while (dataAtual < hoje) {
         dataAtual.setDate(dataAtual.getDate() + 1);
-        if (dataAtual.getDay() !== 0) { // 0 = Domingo
+        if (dataAtual.getDay() !== 0) { // Exclui Domingo
             diffDias++;
         }
     }
@@ -144,7 +169,6 @@ async function salvarCliente() {
             return;
         }
 
-        // Processa imagens do cadastro
         let fotoBase64 = await converterImagemParaBase64(fotoPerfilFile);
         let docBase64 = await converterImagemParaBase64(docFrenteVersoFile);
         let resBase64 = await converterImagemParaBase64(fotoResidenciaFile);
@@ -274,13 +298,13 @@ function abrirCliente(id) {
         ? `<p style="text-align: left;">📍 <strong>Localização:</strong> <a href="${cliente.linkLocalizacao}" target="_blank" style="color: #d4af37;">Abrir no Maps</a></p>`
         : '';
 
-    let docImg = cliente.docFoto ? `<p><strong>Documento (RG/CNH):</strong></p><img src="${cliente.docFoto}" class="img-anexo">` : '';
-    let resImg = cliente.resFoto ? `<p><strong>Residência / Comprovante:</strong></p><img src="${cliente.resFoto}" class="img-anexo">` : '';
-    let printImg = cliente.printFoto ? `<p><strong>Print Ganhos / App:</strong></p><img src="${cliente.printFoto}" class="img-anexo">` : '';
+    let docImg = cliente.docFoto ? `<p><strong>Documento (RG/CNH):</strong> 🔍 <em>(clique p/ ampliar)</em></p><img src="${cliente.docFoto}" class="img-anexo" onclick="abrirModalImagem('${cliente.docFoto}')">` : '';
+    let resImg = cliente.resFoto ? `<p><strong>Residência / Comprovante:</strong> 🔍 <em>(clique p/ ampliar)</em></p><img src="${cliente.resFoto}" class="img-anexo" onclick="abrirModalImagem('${cliente.resFoto}')">` : '';
+    let printImg = cliente.printFoto ? `<p><strong>Print Ganhos / App:</strong> 🔍 <em>(clique p/ ampliar)</em></p><img src="${cliente.printFoto}" class="img-anexo" onclick="abrirModalImagem('${cliente.printFoto}')">` : '';
 
     detalhes.innerHTML = `
     <div class="card" style="text-align: center;">
-        <img src="${urlFoto}" class="avatar-detalhe" alt="Foto Perfil">
+        <img src="${urlFoto}" class="avatar-detalhe" alt="Foto Perfil" onclick="abrirModalImagem('${urlFoto}')">
         <h2>${cliente.nome}</h2>
         <p style="text-align: left;"><strong>Status:</strong> ${textoStatus}</p>
         <p style="text-align: left;"><strong>CPF:</strong> ${cliente.cpf || 'Não informado'}</p>
@@ -474,7 +498,7 @@ function atualizarDashboard() {
     document.getElementById("totalAberto").innerText = formatarMoeda(aberto);
 }
 
-// FUNÇÃO DO BOTÃO MANUAL DE BUSCAR ATUALIZAÇÕES
+// BOTÃO MANUAL DE ATUALIZAÇÃO
 window.verificarAtualizacao = async function() {
     if ('serviceWorker' in navigator) {
         try {
@@ -482,7 +506,7 @@ window.verificarAtualizacao = async function() {
             if (reg) {
                 alert("Verificando se há novas atualizações no servidor...");
                 await reg.update();
-                
+
                 if (!reg.waiting && !reg.installing) {
                     alert("Seu aplicativo já está na versão mais recente!");
                 }
@@ -498,7 +522,7 @@ window.verificarAtualizacao = async function() {
     }
 };
 
-// EXPOSIÇÃO GLOBAL DE FUNÇÕES
+// EXPOSIÇÃO GLOBAL
 window.salvarCliente = salvarCliente;
 window.pagar = pagar;
 window.aplicarMulta = aplicarMulta;
@@ -512,7 +536,7 @@ window.abrirTela = abrirTela;
 // CARREGAR INICIAL
 mostrarClientes();
 
-// LOGICA PWA & SERVICE WORKER (AUTO-UPDATE COMPLETO PARA APP INSTALADO)
+// SERVICE WORKER & PWA AUTO-UPDATE
 let eventoInstalacao = null;
 
 window.addEventListener("beforeinstallprompt", (evento) => {
@@ -538,7 +562,6 @@ if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then(reg => {
             console.log('Service Worker ativo!');
 
-            // Força checagem de atualização imediata no servidor
             reg.update();
 
             reg.onupdatefound = () => {
@@ -548,7 +571,6 @@ if ('serviceWorker' in navigator) {
                 instalando.onstatechange = () => {
                     if (instalando.state === 'installed') {
                         if (navigator.serviceWorker.controller) {
-                            // Manda sinal para o Service Worker novo assumir o app
                             instalando.postMessage({ action: 'skipWaiting' });
                         }
                     }
@@ -556,7 +578,6 @@ if ('serviceWorker' in navigator) {
             };
         }).catch(err => console.error('Erro SW:', err));
 
-        // Recarrega o app assim que a nova versão do SW assumir
         let recarregando = false;
         navigator.serviceWorker.addEventListener('controllerchange', () => {
             if (!recarregando) {
