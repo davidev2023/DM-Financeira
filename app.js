@@ -87,6 +87,7 @@ function converterImagemParaBase64(file) {
 
                 resolve(canvas.toDataURL("image/jpeg", 0.6));
             };
+            img.onerror = (err) => reject(err);
         };
         reader.onerror = (error) => reject(error);
     });
@@ -163,24 +164,24 @@ function abrirTela(idTela) {
 // CADASTRAR CLIENTE
 async function salvarCliente() {
     try {
-        let nome = document.getElementById("nome").value;
-        let cpf = document.getElementById("cpf").value;
-        let telefone = document.getElementById("telefone").value;
-        let chavePix = document.getElementById("chavePix").value;
-        let endereco = document.getElementById("endereco").value;
-        let linkLocalizacao = document.getElementById("linkLocalizacao").value;
-        let placaVeiculo = document.getElementById("placaVeiculo").value;
-        let valor = Number(document.getElementById("valor").value);
-        let data = document.getElementById("data").value;
+        let nome = document.getElementById("nome")?.value || "";
+        let cpf = document.getElementById("cpf")?.value || "";
+        let telefone = document.getElementById("telefone")?.value || "";
+        let chavePix = document.getElementById("chavePix")?.value || "";
+        let endereco = document.getElementById("endereco")?.value || "";
+        let linkLocalizacao = document.getElementById("linkLocalizacao")?.value || "";
+        let placaVeiculo = document.getElementById("placaVeiculo")?.value || "";
+        let valor = Number(document.getElementById("valor")?.value || 0);
+        let data = document.getElementById("data")?.value || "";
         
-        let ref1 = document.getElementById("ref1").value;
-        let ref2 = document.getElementById("ref2").value;
-        let ref3 = document.getElementById("ref3").value;
+        let ref1 = document.getElementById("ref1")?.value || "";
+        let ref2 = document.getElementById("ref2")?.value || "";
+        let ref3 = document.getElementById("ref3")?.value || "";
 
-        let fotoPerfilFile = document.getElementById("fotoCliente").files[0];
-        let docFrenteVersoFile = document.getElementById("docFrenteVerso").files[0];
-        let fotoResidenciaFile = document.getElementById("fotoResidencia").files[0];
-        let printGanhosFile = document.getElementById("printGanhos").files[0];
+        let fotoPerfilFile = document.getElementById("fotoCliente")?.files[0];
+        let docFrenteVersoFile = document.getElementById("docFrenteVerso")?.files[0];
+        let fotoResidenciaFile = document.getElementById("fotoResidencia")?.files[0];
+        let printGanhosFile = document.getElementById("printGanhos")?.files[0];
 
         if (nome === "" || telefone === "" || data === "") {
             alert("Preencha Nome, Telefone e Data do Empréstimo!");
@@ -252,6 +253,7 @@ async function mostrarClientes() {
         atualizarDashboard();
 
         let lista = document.getElementById("listaClientes");
+        if (!lista) return;
         lista.innerHTML = "";
 
         if (clientes.length === 0) {
@@ -303,6 +305,7 @@ function abrirCliente(id) {
 
     const { atraso, status } = calcularAtraso(cliente);
     let detalhes = document.getElementById("detalhes");
+    if (!detalhes) return;
 
     let textoStatus = '🟢 Em Dia';
     if (status === 'vermelho') textoStatus = `🔴 ATRASADO (${atraso} diária(s) pendentes)`;
@@ -418,7 +421,7 @@ async function pagar(id) {
 
 // COBRANÇA WHATSAPP
 function whatsapp(numero, nome, valorDiaria, atraso) {
-    let numLimpo = numero.replace(/\D/g, '');
+    let numLimpo = (numero || '').replace(/\D/g, '');
     let textoAtraso = atraso > 0 ? `\n\n⚠️ *Atenção:* Você possui *${atraso} diária(s) em atraso*.` : '';
     
     let mensagem = `Olá ${nome}, passando para lembrar da sua diária de ${formatarMoeda(valorDiaria)} da DM Financeira.${textoAtraso}\n\n⏰ *Lembrete:* Os pagamentos devem ser realizados até às 18h.`;
@@ -432,7 +435,7 @@ function comprovante(id) {
     let cliente = clientes.find(c => c.id === id);
     if (!cliente) return;
 
-    let numLimpo = cliente.telefone.replace(/\D/g, '');
+    let numLimpo = (cliente.telefone || '').replace(/\D/g, '');
     let restantes = cliente.totalParcelas - cliente.pagas;
     const { atraso } = calcularAtraso(cliente);
 
@@ -474,22 +477,14 @@ async function excluirCliente(id) {
 
 // LIMPAR FORMULÁRIO
 function limpar() {
-    document.getElementById("nome").value = "";
-    document.getElementById("cpf").value = "";
-    document.getElementById("telefone").value = "";
-    document.getElementById("chavePix").value = "";
-    document.getElementById("endereco").value = "";
-    document.getElementById("linkLocalizacao").value = "";
-    document.getElementById("placaVeiculo").value = "";
-    document.getElementById("valor").value = "300";
-    document.getElementById("data").value = "";
-    document.getElementById("ref1").value = "";
-    document.getElementById("ref2").value = "";
-    document.getElementById("ref3").value = "";
-    document.getElementById("fotoCliente").value = "";
-    document.getElementById("docFrenteVerso").value = "";
-    document.getElementById("fotoResidencia").value = "";
-    document.getElementById("printGanhos").value = "";
+    const ids = ["nome", "cpf", "telefone", "chavePix", "endereco", "linkLocalizacao", "placaVeiculo", "data", "ref1", "ref2", "ref3", "fotoCliente", "docFrenteVerso", "fotoResidencia", "printGanhos"];
+    ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = "";
+    });
+
+    const valorEl = document.getElementById("valor");
+    if (valorEl) valorEl.value = "300";
 }
 
 // ATUALIZAR DASHBOARD
@@ -510,10 +505,15 @@ function atualizarDashboard() {
         aberto += (p * totalP) - (p * pagas);
     });
 
-    document.getElementById("totalClientes").innerText = totalClientes;
-    document.getElementById("totalEmprestado").innerText = formatarMoeda(emprestado);
-    document.getElementById("totalRecebido").innerText = formatarMoeda(recebido);
-    document.getElementById("totalAberto").innerText = formatarMoeda(aberto);
+    const elTotal = document.getElementById("totalClientes");
+    const elEmp = document.getElementById("totalEmprestado");
+    const elRec = document.getElementById("totalRecebido");
+    const elAbe = document.getElementById("totalAberto");
+
+    if (elTotal) elTotal.innerText = totalClientes;
+    if (elEmp) elEmp.innerText = formatarMoeda(emprestado);
+    if (elRec) elRec.innerText = formatarMoeda(recebido);
+    if (elAbe) elAbe.innerText = formatarMoeda(aberto);
 }
 
 // BOTÃO MANUAL DE ATUALIZAÇÃO
