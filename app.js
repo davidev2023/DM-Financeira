@@ -59,7 +59,7 @@ function converterImagemParaBase64(file) {
                 const ctx = canvas.getContext("2d");
                 ctx.drawImage(img, 0, 0, width, height);
 
-                // Comprime em JPEG leve para otimizar no Firestore
+                // Comprime em JPEG leve para salvar rápido no Firestore
                 resolve(canvas.toDataURL("image/jpeg", 0.6));
             };
         };
@@ -474,7 +474,31 @@ function atualizarDashboard() {
     document.getElementById("totalAberto").innerText = formatarMoeda(aberto);
 }
 
-// EXPOSIÇÃO GLOBAL
+// FUNÇÃO DO BOTÃO MANUAL DE BUSCAR ATUALIZAÇÕES
+window.verificarAtualizacao = async function() {
+    if ('serviceWorker' in navigator) {
+        try {
+            const reg = await navigator.serviceWorker.getRegistration();
+            if (reg) {
+                alert("Verificando se há novas atualizações no servidor...");
+                await reg.update();
+                
+                if (!reg.waiting && !reg.installing) {
+                    alert("Seu aplicativo já está na versão mais recente!");
+                }
+            } else {
+                window.location.reload();
+            }
+        } catch (error) {
+            console.error("Erro ao buscar atualização:", error);
+            window.location.reload();
+        }
+    } else {
+        window.location.reload();
+    }
+};
+
+// EXPOSIÇÃO GLOBAL DE FUNÇÕES
 window.salvarCliente = salvarCliente;
 window.pagar = pagar;
 window.aplicarMulta = aplicarMulta;
@@ -514,7 +538,7 @@ if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then(reg => {
             console.log('Service Worker ativo!');
 
-            // Força a verificação no GitHub imediatamente ao carregar
+            // Força checagem de atualização imediata no servidor
             reg.update();
 
             reg.onupdatefound = () => {
@@ -524,7 +548,7 @@ if ('serviceWorker' in navigator) {
                 instalando.onstatechange = () => {
                     if (instalando.state === 'installed') {
                         if (navigator.serviceWorker.controller) {
-                            // Envia o comando para o novo SW assumir na hora
+                            // Manda sinal para o Service Worker novo assumir o app
                             instalando.postMessage({ action: 'skipWaiting' });
                         }
                     }
@@ -532,7 +556,7 @@ if ('serviceWorker' in navigator) {
             };
         }).catch(err => console.error('Erro SW:', err));
 
-        // Quando o novo Service Worker tomar conta, a página atualiza sozinha
+        // Recarrega o app assim que a nova versão do SW assumir
         let recarregando = false;
         navigator.serviceWorker.addEventListener('controllerchange', () => {
             if (!recarregando) {
