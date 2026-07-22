@@ -1,4 +1,4 @@
-const cacheName = "dm-financeira-v10";
+const cacheName = "dm-financeira-v12";
 
 const arquivos = [
   "./",
