@@ -59,7 +59,7 @@ function converterImagemParaBase64(file) {
                 const ctx = canvas.getContext("2d");
                 ctx.drawImage(img, 0, 0, width, height);
 
-                // Comprime em JPEG leve para salvar no banco com rapidez
+                // Comprime em JPEG leve para otimizar o salvamento no Firestore
                 resolve(canvas.toDataURL("image/jpeg", 0.6));
             };
         };
@@ -84,7 +84,7 @@ function calcularAtraso(cliente) {
 
     while (dataAtual < hoje) {
         dataAtual.setDate(dataAtual.getDate() + 1);
-        if (dataAtual.getDay() !== 0) {
+        if (dataAtual.getDay() !== 0) { // 0 = Domingo (ignorado)
             diffDias++;
         }
     }
@@ -144,7 +144,7 @@ async function salvarCliente() {
             return;
         }
 
-        // Processa imagens de garantia
+        // Processa imagens do cadastro
         let fotoBase64 = await converterImagemParaBase64(fotoPerfilFile);
         let docBase64 = await converterImagemParaBase64(docFrenteVersoFile);
         let resBase64 = await converterImagemParaBase64(fotoResidenciaFile);
@@ -488,7 +488,7 @@ window.abrirTela = abrirTela;
 // CARREGAR INICIAL
 mostrarClientes();
 
-// LOGICA PWA & SERVICE WORKER
+// LOGICA PWA & SERVICE WORKER (COM AUTO-UPDATE AUTOMÁTICO)
 let eventoInstalacao = null;
 
 window.addEventListener("beforeinstallprompt", (evento) => {
@@ -511,8 +511,19 @@ document.getElementById("btnInstalar")?.addEventListener("click", async () => {
 
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
-            .then(reg => console.log('Service Worker ativo!', reg))
-            .catch(err => console.error('Erro SW:', err));
+        navigator.serviceWorker.register('./sw.js').then(reg => {
+            console.log('Service Worker ativo!', reg);
+
+            // Detecta quando o sw.js muda de versão no GitHub e recarrega automaticamente
+            reg.onupdatefound = () => {
+                const instalando = reg.installing;
+                instalando.onstatechange = () => {
+                    if (instalando.state === 'installed' && navigator.serviceWorker.controller) {
+                        console.log('Nova versão encontrada! Recarregando...');
+                        window.location.reload();
+                    }
+                };
+            };
+        }).catch(err => console.error('Erro SW:', err));
     });
 }
