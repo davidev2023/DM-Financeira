@@ -7,6 +7,10 @@
     <meta name="theme-color" content="#181818">
     <title>DM Financeira</title>
     <link rel="stylesheet" href="style.css">
+    <!-- BIBLIOTECA PARA O GRÁFICO DO DASHBOARD -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 </head>
 <body>
 
@@ -26,13 +30,20 @@
     </header>
 
     <main>
-        <!-- DASHBOARD -->
+        <!-- DASHBOARD COM GRÁFICO -->
         <section id="dashboard" class="tela ativa">
             <div class="dashboard">
                 <div class="box"><h3>👥 Clientes</h3><p id="totalClientes">0</p></div>
                 <div class="box"><h3>💰 Emprestado</h3><p id="totalEmprestado">R$ 0,00</p></div>
                 <div class="box"><h3>✅ Recebido</h3><p id="totalRecebido">R$ 0,00</p></div>
                 <div class="box"><h3>⏳ Em Aberto</h3><p id="totalAberto">R$ 0,00</p></div>
+            </div>
+
+            <div class="card" style="margin-top: 15px; text-align: center;">
+                <h2>📊 Resumo Financeiro</h2>
+                <div style="position: relative; max-width: 320px; margin: 0 auto;">
+                    <canvas id="graficoDashboard"></canvas>
+                </div>
             </div>
         </section>
 
@@ -125,6 +136,23 @@
         <!-- DETALHES DO CLIENTE -->
         <section id="detalhesCliente" class="tela">
             <div id="detalhes"></div>
+        </section>
+
+        <!-- NOVA TELA DE PARCELAS DO CLIENTE -->
+        <section id="parcelasCliente" class="tela">
+            <div class="card">
+                <button class="btn-voltar" onclick="abrirTela('clientes')">⬅️ Voltar para Clientes</button>
+                <h2 id="nomeClienteParcelas">Gerenciar Parcelas</h2>
+                
+                <div class="secao-multa">
+                    <label>
+                        <input type="checkbox" id="aplicarMultaAtraso" onchange="recalcularMultaVisual()">
+                        <span>Aplicar Multa (+10%) nas parcelas atrasadas</span>
+                    </label>
+                </div>
+
+                <div id="listaParcelas"></div>
+            </div>
         </section>
     </main>
 
