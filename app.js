@@ -518,6 +518,7 @@ function abrirCliente(id) {
         <hr style="margin: 10px 0; border-color: #333;">
 
         <p style="text-align: left;">💰 <strong>Valor Diário Base:</strong> ${formatarMoeda(cliente.parcela)}/dia</p>
+        <p style="text-align: left;">🗓️ <strong>Data Empréstimo:</strong> ${cliente.data ? cliente.data.split('-').reverse().join('/') : 'N/A'}</p>
         <p style="text-align: left;">🗓️ <strong>Progresso:</strong> ${cliente.pagas}/${cliente.totalParcelas} pagas</p>
         
         <div style="text-align: left; margin-top: 10px;">
@@ -549,7 +550,7 @@ function abrirCliente(id) {
     abrirTela('detalhesCliente');
 }
 
-// ABRIR EDIÇÃO DO CLIENTE
+// ABRIR EDIÇÃO DO CLIENTE (INCLUINDO DATA DO EMPRÉSTIMO)
 function abrirModalEditar(id) {
     let cliente = clientes.find(c => c.id === id);
     if (!cliente) return;
@@ -589,6 +590,9 @@ function abrirModalEditar(id) {
         <label>Valor Diário (R$):</label>
         <input type="number" id="editParcela" value="${cliente.parcela || 0}">
 
+        <label>Data do Empréstimo:</label>
+        <input type="date" id="editData" value="${cliente.data || ''}">
+
         <label>Referências:</label>
         <input type="text" id="editRef1" value="${ref1}" placeholder="Ref 1">
         <input type="text" id="editRef2" value="${ref2}" placeholder="Ref 2">
@@ -615,7 +619,7 @@ function abrirModalEditar(id) {
     `;
 }
 
-// SALVAR ALTERAÇÕES DO CLIENTE
+// SALVAR ALTERAÇÕES DO CLIENTE (INCLUINDO A DATA REVISADA)
 async function salvarEdicaoCliente(id) {
     try {
         let clienteAntigo = clientes.find(c => c.id === id);
@@ -629,6 +633,7 @@ async function salvarEdicaoCliente(id) {
         let linkLocalizacao = document.getElementById("editLinkLocalizacao").value.trim();
         let placaVeiculo = document.getElementById("editPlacaVeiculo").value.trim();
         let parcela = Number(document.getElementById("editParcela").value || 0);
+        let data = document.getElementById("editData").value;
 
         let ref1 = document.getElementById("editRef1").value.trim();
         let ref2 = document.getElementById("editRef2").value.trim();
@@ -645,12 +650,12 @@ async function salvarEdicaoCliente(id) {
         let printFoto = filePrint ? await converterImagemParaBase64(filePrint) : (clienteAntigo.printFoto || clienteAntigo.printGanhos || "");
 
         await updateDoc(doc(db, "clientes", id), {
-            nome, cpf, telefone, chavePix, endereco, linkLocalizacao, placaVeiculo, parcela,
+            nome, cpf, telefone, chavePix, endereco, linkLocalizacao, placaVeiculo, parcela, data,
             referencias: [ref1, ref2, ref3].filter(r => r !== ""),
             foto, docFoto, resFoto, printFoto
         });
 
-        alert("Dados atualizados!");
+        alert("Dados atualizados com sucesso!");
         await mostrarClientes();
         abrirCliente(id);
     } catch (e) {
